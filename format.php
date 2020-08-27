@@ -210,7 +210,7 @@ if (!$PAGE->user_is_editing())
 
         //the default action is to set the name of each topic to null.
         $secname = $thissection->name;
-        //this will set the name of undefined sections to a number. 
+        //this will set the name of undefined sections to a number.
 
         if ($secname == null)
         {
@@ -229,7 +229,7 @@ if (!$PAGE->user_is_editing())
     }
     echo '</ul>';
 
-    echo '<div>'; //should be the div for content. 
+    echo '<div>'; //should be the div for content.
     //this is the actual bits that we need.
     $section = $start_tab;
     $sectionmenu = array();
@@ -313,7 +313,7 @@ if (!$PAGE->user_is_editing())
             }
             //the default action is to set the name of each topic to null.
             $secname = $thissection->name;
-            //this will set the name of undefined sections to a number. 
+            //this will set the name of undefined sections to a number.
             if ($secname == null)
             {
                 $secname = $secname . $num;
@@ -338,33 +338,33 @@ if (!$PAGE->user_is_editing())
                 {
                     if ($course->marker == $section)
                     {  // Show the "light globe" on/off
-                        echo '<a href="view.php?id=' . $course->id . '&amp;marker=0&amp;sesskey=' . sesskey() . '#section-' . $section . '" title="' . $strmarkedthistopic . '">' . '<img src="' . $OUTPUT->pix_url('i/marked') . '" alt="' . $strmarkedthistopic . '" /></a><br />';
+                        echo '<a href="view.php?id=' . $course->id . '&amp;marker=0&amp;sesskey=' . sesskey() . '#section-' . $section . '" title="' . $strmarkedthistopic . '">' . $OUTPUT->pix_icon('i/marked', $strmarkedthistopic) . '"</a><br />';
                     }
                     else
                     {
-                        echo '<a href="view.php?id=' . $course->id . '&amp;marker=' . $section . '&amp;sesskey=' . sesskey() . '#section-' . $section . '" title="' . $strmarkthistopic . '">' . '<img src="' . $OUTPUT->pix_url('i/marker') . '" alt="' . $strmarkthistopic . '" /></a><br />';
+                        echo '<a href="view.php?id=' . $course->id . '&amp;marker=' . $section . '&amp;sesskey=' . sesskey() . '#section-' . $section . '" title="' . $strmarkthistopic . '">' . $OUTPUT->pix_icon('i/marker', $strmarkthistopic) . '"</a><br />';
                     }
 
                     if ($thissection->visible)
                     {   // Show the hide/show eye
                         echo '<a href="view.php?id=' . $course->id . '&amp;hide=' . $section . '&amp;sesskey=' . sesskey() . '#section-' . $section . '" title="' . $strtopichide . '">' .
-                        '<img src="' . $OUTPUT->pix_url('i/hide') . '" class="icon hide" alt="' . $strtopichide . '" /></a><br />';
+                        $OUTPUT->pix_icon('i/hide', $strtopichide, 'moodle', ['class' => 'icon hide']) . '"</a><br />';
                     }
                     else
                     {
                         echo '<a href="view.php?id=' . $course->id . '&amp;show=' . $section . '&amp;sesskey=' . sesskey() . '#section-' . $section . '" title="' . $strtopicshow . '">' .
-                        '<img src="' . $OUTPUT->pix_url('i/show') . '" class="icon hide" alt="' . $strtopicshow . '" /></a><br />';
+                        $OUTPUT->pix_icon('i/show', $strtopicshow, 'moodle', ['class' => 'icon show']) . '"</a><br />';
                     }
                     if ($section > 1)
                     {   // Add a arrow to move section up
                         echo '<a href="view.php?id=' . $course->id . '&amp;random=' . rand(1, 10000) . '&amp;section=' . $section . '&amp;move=-1&amp;sesskey=' . sesskey() . '#section-' . ($section - 1) . '" title="' . $strmoveup . '">' .
-                        '<img src="' . $OUTPUT->pix_url('t/up') . '" class="icon up" alt="' . $strmoveup . '" /></a><br />';
+                        $OUTPUT->pix_icon('t/up', $strmoveup, 'moodle', ['class' => 'icon up']) . '"</a><br />';
                     }
 
                     if ($section < $course->numsections)
                     {   // Add a arrow to move section down
                         echo '<a href="view.php?id=' . $course->id . '&amp;random=' . rand(1, 10000) . '&amp;section=' . $section . '&amp;move=1&amp;sesskey=' . sesskey() . '#section-' . ($section + 1) . '" title="' . $strmovedown . '">' .
-                        '<img src="' . $OUTPUT->pix_url('t/down') . '" class="icon down" alt="' . $strmovedown . '" /></a><br />';
+                        $OUTPUT->pix_icon('t/down', $strmovedown, 'moodle', ['class' => 'icon down']) . '"</a><br />';
                     }
                 }
                 echo '</div>';
@@ -384,7 +384,7 @@ if (!$PAGE->user_is_editing())
 
                     //If not visible - show icon for people who can see it
                     if (!$thissection->visible)
-                        $display .= "<img style='float:right' src='" . $OUTPUT->pix_url('i/show') . "'/>";
+                        $display .= $OUTPUT->pix_icon('i/show', $strtopicshow, 'moodle', ['style' => 'float:right']);
 
                     //output header for section
                     echo $OUTPUT->heading($display, 3, 'sectionname');
@@ -424,7 +424,7 @@ if (!$PAGE->user_is_editing())
                     if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $context_check))
                     {
                         echo ' <a title="' . $streditsummary . '" href="editsection.php?id=' . $thissection->id . '">' .
-                        '<img src="' . $OUTPUT->pix_url('t/edit') . '" class="icon edit" alt="' . $streditsummary . '" /></a><br /><br />';
+                        $OUTPUT->pix_url('t/edit', $streditsummary) . '" class="icon edit" /></a><br /><br />';
                     }
                     echo '</div>';
 

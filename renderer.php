@@ -55,7 +55,7 @@ class format_tabtopics_renderer extends format_section_renderer_base
      * @param bool $onsectionpage true if being printed on a section page
      * @return array of links with edit controls
      */
-    protected function section_edit_controls($course, $section, $onsectionpage = false)
+    protected function section_edit_control_items($course, $section, $onsectionpage = false)
     {
         global $PAGE;
 
@@ -93,19 +93,19 @@ class format_tabtopics_renderer extends format_section_renderer_base
             }
         }
 
-        return array_merge($controls, parent::section_edit_controls($course, $section, $onsectionpage));
+        return array_merge($controls, parent::section_edit_control_items($course, $section, $onsectionpage));
     }
-    
+
     /**
      * Displays the avaliability message if not visible
      */
     public function section_availability_message($section, $canViewHidden) {
         echo parent::section_availability_message($section, $canViewHidden);
     }
-    
+
     /**
      * Display a hidden section message
-     * 
+     *
      * @param type $section
      */
     public function section_hidden($section, $courseorid = null) {

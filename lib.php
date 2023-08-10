@@ -18,7 +18,7 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/format/lib.php');
 
-class format_tabtopics extends format_base {
+class format_tabtopics extends core_courseformat\base {
 
     /**
      * Returns true if this course format uses sections

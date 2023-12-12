@@ -438,8 +438,15 @@ if (!$PAGE->user_is_editing())
                     }
                 }
 
-                //echo a conditional message if avaliable
-                echo $tabtopicsrenderer->section_availability_message($thissection, has_capability('moodle/course:viewhiddensections', $context));
+                if (has_capability('moodle/course:viewhiddensections', $context)) {
+                    $format = course_get_format($course);
+                    $availabilityclass = $format->get_output_classname('content\\section\\availability');
+                    $availability = new $availabilityclass(
+                        $format,
+                        $thissection,
+                    );
+                    echo $corerenderer->render($availability);
+                }
 
                 echo '</div>';
                 echo '</div>';

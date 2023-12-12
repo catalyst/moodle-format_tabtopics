@@ -17,24 +17,22 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/format/renderer.php');
 
-class format_tabtopics_renderer extends format_section_renderer_base
-{
+class format_tabtopics_renderer extends format_section_renderer_base {
+
 
     /**
      * Generate the starting container html for a list of sections
      * @return string HTML to output.
      */
-    protected function start_section_list()
-    {
-        return html_writer::start_tag('ul', array('class' => 'tabtopics'));
+    protected function start_section_list() {
+        return html_writer::start_tag('ul', ['class' => 'tabtopics']);
     }
 
     /**
      * Generate the closing container html for a list of sections
      * @return string HTML to output.
      */
-    protected function end_section_list()
-    {
+    protected function end_section_list() {
         return html_writer::end_tag('ul');
     }
 
@@ -42,8 +40,7 @@ class format_tabtopics_renderer extends format_section_renderer_base
      * Generate the title for this section page
      * @return string the page title
      */
-    protected function page_title()
-    {
+    protected function page_title() {
         return get_string('topicoutline');
     }
 
@@ -55,13 +52,12 @@ class format_tabtopics_renderer extends format_section_renderer_base
      * @param bool $onsectionpage true if being printed on a section page
      * @return array of links with edit controls
      */
-    protected function section_edit_control_items($course, $section, $onsectionpage = false)
-    {
+    protected function section_edit_control_items($course, $section, $onsectionpage = false) {
         global $PAGE;
 
         if (!$PAGE->user_is_editing())
         {
-            return array();
+            return [];
         }
 
         $coursecontext = context_course::instance($course->id);
@@ -76,31 +72,21 @@ class format_tabtopics_renderer extends format_section_renderer_base
         }
         $url->param('sesskey', sesskey());
 
-        $controls = array();
+        $controls = [];
         if (has_capability('moodle/course:setcurrentsection', $coursecontext))
         {
-            if ($course->marker == $section->section)
-            {  // Show the "light globe" on/off.
+            if ($course->marker == $section->section) {  // Show the "light globe" on/off.
                 $url->param('marker', 0);
-                $controls[] = html_writer::link($url, html_writer::empty_tag('img', array('src' => $this->output->pix_url('i/marked'),
-                                    'class' => 'icon ', 'alt' => get_string('markedthistopic'))), array('title' => get_string('markedthistopic'), 'class' => 'editing_highlight'));
-            }
-            else
-            {
+                $controls[] = html_writer::link($url, html_writer::empty_tag('img', ['src' => $this->output->pix_url('i/marked'),
+                                    'class' => 'icon ', 'alt' => get_string('markedthistopic'), ]), ['title' => get_string('markedthistopic'), 'class' => 'editing_highlight']);
+            } else {
                 $url->param('marker', $section->section);
-                $controls[] = html_writer::link($url, html_writer::empty_tag('img', array('src' => $this->output->pix_url('i/marker'),
-                                    'class' => 'icon', 'alt' => get_string('markthistopic'))), array('title' => get_string('markthistopic'), 'class' => 'editing_highlight'));
+                $controls[] = html_writer::link($url, html_writer::empty_tag('img', ['src' => $this->output->pix_url('i/marker'),
+                                    'class' => 'icon', 'alt' => get_string('markthistopic'), ]), ['title' => get_string('markthistopic'), 'class' => 'editing_highlight']);
             }
         }
 
         return array_merge($controls, parent::section_edit_control_items($course, $section, $onsectionpage));
-    }
-
-    /**
-     * Displays the avaliability message if not visible
-     */
-    public function section_availability_message($section, $canViewHidden) {
-        echo parent::section_availability_message($section, $canViewHidden);
     }
 
     /**

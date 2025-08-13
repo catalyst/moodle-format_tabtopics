@@ -32,6 +32,8 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/format/lib.php');
 
+use core\url;
+
 /**
  * Main class for the course format Tab topics
  *
@@ -78,11 +80,11 @@ class format_tabtopics extends core_courseformat\base {
      * @param array $options options for view URL. At the moment core uses:
      *     'navigation' (bool) if true and section has no separate page, the function returns null
      *     'sr' (int) used by multipage formats to specify to which section to return
-     * @return null|moodle_url
+     * @return url
      */
     public function get_view_url($section, $options = []) {
         $course = $this->get_course();
-        $url = new moodle_url('/course/view.php', ['id' => $course->id]);
+        $url = new url('/course/view.php', ['id' => $course->id]);
 
         $sr = null;
         if (array_key_exists('sr', $options)) {
@@ -108,7 +110,7 @@ class format_tabtopics extends core_courseformat\base {
                 $url->param('section', $sectionno);
             } else {
                 if (!empty($options['navigation'])) {
-                    return null;
+                    return new url('');
                 }
                 $url->set_anchor('section-' . $sectionno);
             }
@@ -165,6 +167,8 @@ class format_tabtopics extends core_courseformat\base {
         $titles = [];
         $course = $this->get_course();
         $modinfo = get_fast_modinfo($course);
+        // phpcs:ignore moodle.Commenting.InlineComment.DocBlock
+        /** @var format_tabtopics\output\renderer */
         $renderer = $this->get_renderer($PAGE);
         if ($renderer && ($sections = $modinfo->get_section_info_all())) {
             foreach ($sections as $number => $section) {
@@ -396,7 +400,7 @@ class format_tabtopics extends core_courseformat\base {
     /**
      * Determines whether the unavaliable override is avaliable
      *
-     * @param type $thissection
+     * @param stdClass $thissection
      * @return boolean
      */
     public function is_unavailable_override($thissection) {
@@ -410,7 +414,7 @@ class format_tabtopics extends core_courseformat\base {
     /**
      * Determines whether the user can access or view the section
      *
-     * @param Object $thissection
+     * @param stdClass $thissection
      * @return boolean true on visible to user, else false
      */
     public function check_user_access($thissection) {

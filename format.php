@@ -34,18 +34,18 @@ require_once($CFG->libdir . '/completionlib.php');
 $PAGE->requires->js('/course/format/tabtopics/module.js');
 
 // Make sure all sections are created.
-$course = course_get_format($course)->get_course();
+// phpcs:ignore moodle.Commenting.InlineComment.DocBlock
+/** @var format_tabtopics */
+$format = course_get_format($course);
+$course = $format->get_course();
 course_create_sections_if_missing($course, range(0, $course->numsections));
-// Replace get_context_instance by the class for moodle 2.6+.
-if (class_exists('context_module')) {
-    $context = context_course::instance($course->id);
-} else {
-    $context = get_context_instance(CONTEXT_COURSE, $course->id);
-}
+$context = context_course::instance($course->id);
+// phpcs:ignore moodle.Commenting.InlineComment.DocBlock
+/** @var format_tabtopics\output\renderer */
 $tabtopicsrenderer = $PAGE->get_renderer('format_tabtopics');
 $corerenderer = $PAGE->get_renderer('core', 'course');
-$iszerotab = course_get_format($course)->is_section_zero_tab();
-$isrememberlasttabsession = course_get_format($course)->is_remember_last_tab_session();
+$iszerotab = $format->is_section_zero_tab();
+$isrememberlasttabsession = $format->is_remember_last_tab_session();
 
 $topic = optional_param('topic', -1, PARAM_INT);
 
@@ -84,7 +84,6 @@ if (!$PAGE->user_is_editing()) {
         $DB->set_field("course", "marker", $marker, ["id" => $course->id]);
     }
 
-    $streditsummary = get_string('editsummary');
     $stradd = get_string('add');
     $stractivities = get_string('activities');
     $strshowalltopics = get_string('showalltopics', 'format_tabtopics');
@@ -101,11 +100,6 @@ if (!$PAGE->user_is_editing()) {
         $strmoveup = get_string('moveup');
         $strmovedown = get_string('movedown');
     }
-
-    // Print the Your progress icon if the track completion is enabled.
-    $completioninfo = new completion_info($course);
-    echo $completioninfo->display_help_icon();
-
 
     // If currently moving a file then show the current clipboard.
     // Not too sure what this does.
@@ -141,16 +135,10 @@ if (!$PAGE->user_is_editing()) {
 
         echo '<div class="summary">';
 
-        // Replace get_context_instance by the class for moodle 2.6+.
-        if (class_exists('context_module')) {
-            $coursecontext = context_course::instance($course->id);
-        } else {
-            $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
-        }
         $summarytext = file_rewrite_pluginfile_urls(
             $thissection->summary,
             'pluginfile.php',
-            $coursecontext->id,
+            $context->id,
             'course',
             'section',
             $thissection->id
@@ -164,7 +152,8 @@ if (!$PAGE->user_is_editing()) {
 
         // If section is not a tab, display as a header.
         if (!$iszerotab) {
-            echo $corerenderer->course_section_cm_list($course, $thissection);
+            $widget = new \core_courseformat\output\local\content\section\cmlist($format, $thissection);
+            echo $tabtopicsrenderer->render($widget);
         }
 
         echo '</div>';
@@ -202,10 +191,10 @@ if (!$PAGE->user_is_editing()) {
         }
 
         // Check if the current section is visible to user.
-        $unavaloverride = course_get_format($course)->is_unavailable_override($thissection);
+        $unavaloverride = $format->is_unavailable_override($thissection);
 
         // Check if override is turned on (informs user section not avaliable).
-        $useraccess = course_get_format($course)->check_user_access($thissection);
+        $useraccess = $format->check_user_access($thissection);
 
         // If don't have access AND override "not avaliable" message not on - slip tab.
         if (!$useraccess && !$unavaloverride) {
@@ -260,10 +249,10 @@ if (!$PAGE->user_is_editing()) {
         }
 
         // Check if the current section is visible to user.
-        $unavaloverride = course_get_format($course)->is_unavailable_override($thissection);
+        $unavaloverride = $format->is_unavailable_override($thissection);
 
         // Check if override is turned on (informs user section not avaliable).
-        $useraccess = course_get_format($course)->check_user_access($thissection);
+        $useraccess = $format->check_user_access($thissection);
 
         // If don't have access AND override "not avaliable" message not on - slip tab.
         if (!$useraccess && !$unavaloverride) {
@@ -321,13 +310,7 @@ if (!$PAGE->user_is_editing()) {
                 echo '<div id="section-' . $section . '">';
                 // Note, 'right side' is BEFORE content.
                 echo '<div class="right side">';
-                // Replace get_context_instance by the class for moodle 2.6+.
-                if (class_exists('context_module')) {
-                    $contextcheck = context_course::instance($course->id);
-                } else {
-                    $contextcheck = get_context_instance(CONTEXT_COURSE, $course->id);
-                }
-                if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $contextcheck)) {
+                if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $context)) {
                     if ($course->marker == $section) {
                         // Show the "light globe" on/off.
                         echo '<a href="view.php?id=' . $course->id . '&amp;marker=0&amp;sesskey=' . sesskey() . '#section-' .
@@ -389,14 +372,8 @@ if (!$PAGE->user_is_editing()) {
 
                     echo '<div class="summary">';
                     if ($thissection->summary) {
-                        // Replace get_context_instance by the class for moodle 2.6+.
-                        if (class_exists('context_module')) {
-                            $coursecontext = context_course::instance($course->id);
-                        } else {
-                            $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
-                        }
                         $summarytext = file_rewrite_pluginfile_urls($thissection->summary, 'pluginfile.php',
-                            $coursecontext->id, 'course', 'section', $thissection->id);
+                            $context->id, 'course', 'section', $thissection->id);
                         $summaryformatoptions = new stdClass();
                         $summaryformatoptions->noclean = true;
                         $summaryformatoptions->overflowdiv = true;
@@ -405,29 +382,19 @@ if (!$PAGE->user_is_editing()) {
                         echo '&nbsp;';
                     }
 
-                    // Replace get_context_instance by the class for moodle 2.6+.
-                    if (class_exists('context_module')) {
-                        $contextcheck = context_course::instance($course->id);
-                    } else {
-                        $contextcheck = get_context_instance(CONTEXT_COURSE, $course->id);
-                    }
-                    if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $contextcheck)) {
-                        echo ' <a title="' . $streditsummary . '" href="editsection.php?id=' . $thissection->id . '">' .
-                        $OUTPUT->pix_url('t/edit', $streditsummary) . '" class="icon edit" /></a><br /><br />';
-                    }
                     echo '</div>';
 
-
-                    echo $corerenderer->course_section_cm_list($course, $section);
+                    $widget = new \core_courseformat\output\local\content\section\cmlist($format, $thissection);
+                    echo $tabtopicsrenderer->render($widget);
 
                     echo '<br />';
                     if ($PAGE->user_is_editing()) {
-                        echo $corerenderer->course_section_cm_list($course, $section);
+                        $widget = new \core_courseformat\output\local\content\section\cmlist($format, $thissection);
+                        echo $tabtopicsrenderer->render($widget);
                     }
                 }
 
                 if (has_capability('moodle/course:viewhiddensections', $context)) {
-                    $format = course_get_format($course);
                     $availabilityclass = $format->get_output_classname('content\\section\\availability');
                     $availability = new $availabilityclass(
                         $format,
@@ -447,13 +414,7 @@ if (!$PAGE->user_is_editing()) {
     echo '</div>';
     echo '</div>';
 
-    // Replace get_context_instance by the class for moodle 2.6+.
-    if (class_exists('context_module')) {
-        $contextcheck = context_course::instance($course->id);
-    } else {
-        $contextcheck = get_context_instance(CONTEXT_COURSE, $course->id);
-    }
-    if (!$displaysection && $PAGE->user_is_editing() && has_capability('moodle/course:update', $contextcheck)) {
+    if (!$displaysection && $PAGE->user_is_editing() && has_capability('moodle/course:update', $context)) {
         // Print stealth sections if present.
         $modinfo = get_fast_modinfo($course);
         foreach ($sections as $section => $thissection) {
@@ -472,7 +433,8 @@ if (!$PAGE->user_is_editing()) {
             echo '<div class="content">';
             echo $OUTPUT->heading(get_string('orphanedactivities'), 3, 'sectionname');
 
-            echo $corerenderer->course_section_cm_list($course, $thissection);
+            $widget = new \core_courseformat\output\local\content\section\cmlist($format, $thissection);
+            echo $tabtopicsrenderer->render($widget);
 
             echo '</div>';
             echo "</li>\n";
@@ -491,16 +453,13 @@ if (!$PAGE->user_is_editing()) {
         echo $OUTPUT->render($select);
     }
 } else {
-    // This is the editing window.
-    // If Moodle 2.3 or more Generate the sections like the topics.
+    // If editing generate the sections like the topics.
     $renderer = $PAGE->get_renderer('format_topics');
 
-    if (!empty($displaysection)) {
-        $renderer->print_single_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection);
-    } else {
-        $renderer->print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused);
+    if (!is_null($displaysection)) {
+        $format->set_sectionnum($displaysection);
     }
-
-    // Include course format js module.
-    $PAGE->requires->js('/course/format/topics/format.js');
+    $outputclass = $format->get_output_classname('content');
+    $widget = new $outputclass($format);
+    echo $renderer->render($widget);
 }

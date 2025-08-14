@@ -1,12 +1,25 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * *************************************************************************
  * *                 OOHOO Tab topics Course format                       **
  * *************************************************************************
- * @package     format                                                    **
+ * @package     format_tabtopics
  * @subpackage  tabtopics                                                 **
- * @name        tabtopics                                                 **
  * @copyright   oohoo.biz                                                 **
  * @link        http://oohoo.biz                                          **
  * @author      Nicolas Bretin                                            **
@@ -17,6 +30,14 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/format/renderer.php');
 
+/**
+ * Tab topics renderer
+ *
+ * @package   format_tabtopics
+ * @copyright oohoo.biz
+ * @link      http://oohoo.biz
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class format_tabtopics_renderer extends format_section_renderer_base {
 
 
@@ -53,36 +74,40 @@ class format_tabtopics_renderer extends format_section_renderer_base {
      * @return array of links with edit controls
      */
     protected function section_edit_control_items($course, $section, $onsectionpage = false) {
-        global $PAGE;
-
-        if (!$PAGE->user_is_editing())
-        {
+        if (!$this->page->user_is_editing()) {
             return [];
         }
 
         $coursecontext = context_course::instance($course->id);
 
-        if ($onsectionpage)
-        {
+        if ($onsectionpage) {
             $url = course_get_url($course, $section->section);
-        }
-        else
-        {
+        } else {
             $url = course_get_url($course);
         }
         $url->param('sesskey', sesskey());
 
         $controls = [];
-        if (has_capability('moodle/course:setcurrentsection', $coursecontext))
-        {
-            if ($course->marker == $section->section) {  // Show the "light globe" on/off.
+        if (has_capability('moodle/course:setcurrentsection', $coursecontext)) {
+            if ($course->marker == $section->section) {
+                // Show the "light globe" on/off.
                 $url->param('marker', 0);
-                $controls[] = html_writer::link($url, html_writer::empty_tag('img', ['src' => $this->output->pix_url('i/marked'),
-                                    'class' => 'icon ', 'alt' => get_string('markedthistopic'), ]), ['title' => get_string('markedthistopic'), 'class' => 'editing_highlight']);
+                $image = html_writer::empty_tag('img', [
+                    'src' => $this->output->pix_url('i/marked'),
+                    'class' => 'icon ',
+                    'alt' => get_string('markedthistopic'),
+                ]);
+                $controls[] = html_writer::link($url, $image,
+                    ['title' => get_string('markedthistopic'), 'class' => 'editing_highlight']);
             } else {
                 $url->param('marker', $section->section);
-                $controls[] = html_writer::link($url, html_writer::empty_tag('img', ['src' => $this->output->pix_url('i/marker'),
-                                    'class' => 'icon', 'alt' => get_string('markthistopic'), ]), ['title' => get_string('markthistopic'), 'class' => 'editing_highlight']);
+                $image = html_writer::empty_tag('img', [
+                    'src' => $this->output->pix_url('i/marker'),
+                    'class' => 'icon',
+                    'alt' => get_string('markthistopic'),
+                ]);
+                $controls[] = html_writer::link($url, $image,
+                    ['title' => get_string('markthistopic'), 'class' => 'editing_highlight']);
             }
         }
 

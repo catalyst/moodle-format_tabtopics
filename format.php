@@ -1,19 +1,31 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * *************************************************************************
- * *                 OOHOO Tab topics Course format                       **
- * *************************************************************************
- * @package     format                                                    **
- * @subpackage  tabtopics                                                 **
- * @name        tabtopics                                                 **
- * @copyright   oohoo.biz                                                 **
- * @link        http://oohoo.biz                                          **
- * @author      Nicolas Bretin                                            **
- * @author      Braedan Jongerius                                         **
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later  **
- * *************************************************************************
- * ************************************************************************ */
+ * Tab topics format.
+ *
+ * @package     format_tabtopics
+ * @subpackage  tabtopics
+ * @copyright   oohoo.biz
+ * @link        http://oohoo.biz
+ * @author      Nicolas Bretin
+ * @author      Braedan Jongerius
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/filelib.php');
@@ -21,36 +33,32 @@ require_once($CFG->libdir . '/completionlib.php');
 
 $PAGE->requires->js('/course/format/tabtopics/module.js');
 
-// make sure all sections are created
+// Make sure all sections are created.
 $course = course_get_format($course)->get_course();
 course_create_sections_if_missing($course, range(0, $course->numsections));
-//Replace get_context_instance by the class for moodle 2.6+
-if(class_exists('context_module'))
-{
+// Replace get_context_instance by the class for moodle 2.6+.
+if (class_exists('context_module')) {
     $context = context_course::instance($course->id);
-}
-else
-{
+} else {
     $context = get_context_instance(CONTEXT_COURSE, $course->id);
 }
 $tabtopicsrenderer = $PAGE->get_renderer('format_tabtopics');
 $corerenderer = $PAGE->get_renderer('core', 'course');
-$isZeroTab = course_get_format($course)->is_section_zero_tab();
-$is_remember_last_tab_session = course_get_format($course)->is_remember_last_tab_session();
+$iszerotab = course_get_format($course)->is_section_zero_tab();
+$isrememberlasttabsession = course_get_format($course)->is_remember_last_tab_session();
 
 $topic = optional_param('topic', -1, PARAM_INT);
 
-$jsmodule = array(
+$jsmodule = [
     'name' => 'weekstabs',
     'fullpath' => '/course/format/tabtopics/module.js',
-    'requires' => array('base', 'node', 'json', 'io', 'cookie')
-);
+    'requires' => ['base', 'node', 'json', 'io', 'cookie'],
+];
 
-//THIS IS THE CODE FOR GENERATING THE TABVIEW. ITS ONLY USED DURING NON EDITING
-if (!$PAGE->user_is_editing())
-{
+// THIS IS THE CODE FOR GENERATING THE TABVIEW. ITS ONLY USED DURING NON EDITING.
+if (!$PAGE->user_is_editing()) {
     echo '<script type="text/javascript">
-        var is_remember_last_tab_session = ' . ($is_remember_last_tab_session ? 'true' : 'false') . ';
+        var is_remember_last_tab_session = ' . ($isrememberlasttabsession ? 'true' : 'false') . ';
     </script>';
 
     echo '
@@ -71,10 +79,9 @@ if (!$PAGE->user_is_editing())
 
     ';
 
-    if (($marker >= 0) && has_capability('moodle/course:setcurrentsection', $context) && confirm_sesskey())
-    {
+    if (($marker >= 0) && has_capability('moodle/course:setcurrentsection', $context) && confirm_sesskey()) {
         $course->marker = $marker;
-        $DB->set_field("course", "marker", $marker, array("id" => $course->id));
+        $DB->set_field("course", "marker", $marker, ["id" => $course->id]);
     }
 
     $streditsummary = get_string('editsummary');
@@ -86,8 +93,7 @@ if (!$PAGE->user_is_editing())
     $strgroupmy = get_string('groupmy');
     $editing = $PAGE->user_is_editing();
 
-    if ($editing)
-    {
+    if ($editing) {
         $strtopichide = get_string('hidetopicfromothers');
         $strtopicshow = get_string('showtopicfromothers');
         $strmarkthistopic = get_string('markthistopic');
@@ -96,15 +102,14 @@ if (!$PAGE->user_is_editing())
         $strmovedown = get_string('movedown');
     }
 
-    // Print the Your progress icon if the track completion is enabled
+    // Print the Your progress icon if the track completion is enabled.
     $completioninfo = new completion_info($course);
     echo $completioninfo->display_help_icon();
 
 
-    /// If currently moving a file then show the current clipboard
-    //not too sure what this does
-    if (ismoving($course->id))
-    {
+    // If currently moving a file then show the current clipboard.
+    // Not too sure what this does.
+    if (ismoving($course->id)) {
         // Note, an ordered list would confuse - "1" could be the clipboard or summary.
 
         echo "<ul class='topicstabs'>\n";
@@ -113,40 +118,43 @@ if (!$PAGE->user_is_editing())
         $stractivityclipboard = strip_tags(get_string('activityclipboard', '', $USER->activitycopyname));
         $strcancel = get_string('cancel');
         echo '<li class="clipboard">';
-        echo $stractivityclipboard . '&nbsp;&nbsp;(<a href="mod.php?cancelcopy=true&amp;sesskey=' . sesskey() . '">' . $strcancel . '</a>)';
+        echo $stractivityclipboard . '&nbsp;&nbsp;(<a href="mod.php?cancelcopy=true&amp;sesskey=' . sesskey() .
+            '">' . $strcancel . '</a>)';
         echo "</li>\n";
 
         echo '</ul>';
     }
 
-    //Insert the section 0
+    // Insert the section 0.
     $section = 0;
     $thissection = $sections[$section];
 
-    if ($thissection->summary or $thissection->sequence or $PAGE->user_is_editing())
-    {
+    if ($thissection->summary || $thissection->sequence || $PAGE->user_is_editing()) {
 
         echo '<ul class="sectionul"><li id="sectiontd-0" class="section main yui3-dd-drop">';
 
         echo '<div class="content">';
 
-        if (!empty($thissection->name))
-        {
-            echo $OUTPUT->heading(format_string($thissection->name, true, array('context' => $context)), 3, 'sectionname');
+        if (!empty($thissection->name)) {
+            echo $OUTPUT->heading(format_string($thissection->name, true, ['context' => $context]), 3, 'sectionname');
         }
 
         echo '<div class="summary">';
 
-        //Replace get_context_instance by the class for moodle 2.6+
-        if(class_exists('context_module'))
-        {
+        // Replace get_context_instance by the class for moodle 2.6+.
+        if (class_exists('context_module')) {
             $coursecontext = context_course::instance($course->id);
-        }
-        else
-        {
+        } else {
             $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
         }
-        $summarytext = file_rewrite_pluginfile_urls($thissection->summary, 'pluginfile.php', $coursecontext->id, 'course', 'section', $thissection->id);
+        $summarytext = file_rewrite_pluginfile_urls(
+            $thissection->summary,
+            'pluginfile.php',
+            $coursecontext->id,
+            'course',
+            'section',
+            $thissection->id
+        );
         $summaryformatoptions = new stdClass;
         $summaryformatoptions->noclean = true;
         $summaryformatoptions->overflowdiv = true;
@@ -154,9 +162,8 @@ if (!$PAGE->user_is_editing())
 
         echo '</div>';
 
-        //if section is not a tab, display as a header
-        if (!$isZeroTab)
-        {
+        // If section is not a tab, display as a header.
+        if (!$iszerotab) {
             echo $corerenderer->course_section_cm_list($course, $thissection);
         }
 
@@ -164,30 +171,29 @@ if (!$PAGE->user_is_editing())
         echo "</li>";
     }
 
-    //if section is a tab we want to start sections at 0, otherwise
-    //section 0 is a header and we start at section 1
-    $start_tab = $isZeroTab ? 0 : 1;
+    // If section is a tab we want to start sections at 0,
+    // otherwise section 0 is a header and we start at section 1.
+    $starttab = $iszerotab ? 0 : 1;
 
-    /// Now all the normal modules by topic
-    /// Everything below uses "section" terminology - each "section" is a topic.
+    // Now all the normal modules by topic.
+    // Everything below uses "section" terminology - each "section" is a topic.
     $timenow = time();
-    $section = $start_tab;
-    $sectionmenu = array();
-    $num = $start_tab;
-    echo '<div id="sections">'; //this is the first div that yui looks at, top node
+    $section = $starttab;
+    $sectionmenu = [];
+    $num = $starttab;
+    // This is the first div that yui looks at, top node.
+    echo '<div id="sections">';
 
-    echo '<ul>'; //begining of the unordered list
-    while ($section <= $course->numsections)
-    {
+    // Begining of the unordered list.
+    echo '<ul>';
+    while ($section <= $course->numsections) {
 
-        if (!empty($sections[$section]))
-        {
+        if (!empty($sections[$section])) {
             $thissection = $sections[$section];
-        }
-        else
-        {
+        } else {
+            // Create a new section structure.
             $thissection = new stdClass;
-            $thissection->course = $course->id;   // Create a new section structure
+            $thissection->course = $course->id;
             $thissection->section = $section;
             $thissection->name = null;
             $thissection->summary = '';
@@ -195,56 +201,56 @@ if (!$PAGE->user_is_editing())
             $thissection->visible = 1;
         }
 
-        //check if the current section is visible to user
-        $unaval_override = course_get_format($course)->is_unavailable_override($thissection);
+        // Check if the current section is visible to user.
+        $unavaloverride = course_get_format($course)->is_unavailable_override($thissection);
 
-        //check if override is turned on (informs user section not avaliable)
-        $user_access = course_get_format($course)->check_user_access($thissection);
+        // Check if override is turned on (informs user section not avaliable).
+        $useraccess = course_get_format($course)->check_user_access($thissection);
 
-        //if don't have access AND override "not avaliable" message not on - slip tab
-        if (!$user_access && !$unaval_override)
-        {
+        // If don't have access AND override "not avaliable" message not on - slip tab.
+        if (!$useraccess && !$unavaloverride) {
             $section++;
             continue;
         }
 
-        //the default action is to set the name of each topic to null.
+        // The default action is to set the name of each topic to null.
         $secname = $thissection->name;
-        //this will set the name of undefined sections to a number.
+        // This will set the name of undefined sections to a number.
 
-        if ($secname == null)
-        {
+        if ($secname == null) {
             $secname = $secname . $num;
             $num++;
         }
 
-        if (has_capability('moodle/course:viewhiddensections', $context) || $thissection->visible || (!$thissection->visible && $unaval_override))
-        {   // Hidden for students
-            if ($course->marker == $section)
-                echo '<li id ="marker" class="markerselected"><a href="#section-' . $section . '" id = "marker" class="markerselected">' . $secname . '</a></li>';
-            else
-                echo '<li><a href="#section-' . $section . '">' . $secname . '</a></li>'; //prints each sectio
+        if (has_capability('moodle/course:viewhiddensections', $context)
+                || $thissection->visible || (!$thissection->visible && $unavaloverride)) {
+            // Hidden for students.
+            if ($course->marker == $section) {
+                echo '<li id ="marker" class="markerselected"><a href="#section-' . $section .
+                    '" id = "marker" class="markerselected">' . $secname . '</a></li>';
+            } else {
+                // Prints each section.
+                echo '<li><a href="#section-' . $section . '">' . $secname . '</a></li>';
+            }
         }
         $section++;
     }
     echo '</ul>';
 
-    echo '<div>'; //should be the div for content.
-    //this is the actual bits that we need.
-    $section = $start_tab;
-    $sectionmenu = array();
-    $num = $start_tab;
+    // Should be the div for content.
+    echo '<div>';
+    // This is the actual bits that we need.
+    $section = $starttab;
+    $sectionmenu = [];
+    $num = $starttab;
 
-    while ($section <= $course->numsections)
-    {
-        if (!empty($sections[$section]))
-        {
+    while ($section <= $course->numsections) {
+        if (!empty($sections[$section])) {
             $thissection = $sections[$section];
-        }
-        else
-        {
+        } else {
+            // Create a new section structure.
             $thissection = new stdClass;
-            $thissection->course = $course->id;   // Create a new section structure
+            $thissection->course = $course->id;
             $thissection->section = $section;
             $thissection->name = null;
             $thissection->summary = '';
@@ -253,22 +259,20 @@ if (!$PAGE->user_is_editing())
             $thissection->id = $DB->insert_record('course_sections', $thissection);
         }
 
-        //check if the current section is visible to user
-        $unaval_override = course_get_format($course)->is_unavailable_override($thissection);
+        // Check if the current section is visible to user.
+        $unavaloverride = course_get_format($course)->is_unavailable_override($thissection);
 
-        //check if override is turned on (informs user section not avaliable)
-        $user_access = course_get_format($course)->check_user_access($thissection);
+        // Check if override is turned on (informs user section not avaliable).
+        $useraccess = course_get_format($course)->check_user_access($thissection);
 
-        //if don't have access AND override "not avaliable" message not on - slip tab
-        if (!$user_access && !$unaval_override)
-        {
+        // If don't have access AND override "not avaliable" message not on - slip tab.
+        if (!$useraccess && !$unavaloverride) {
             $section++;
             continue;
         }
 
-        //if user doesn't have access, but override is present - display not avaliable message
-        if (!$user_access && $unaval_override)
-        {
+        // If user doesn't have access, but override is present - display not avaliable message.
+        if (!$useraccess && $unavaloverride) {
             echo '<div id="section-' . $section . '">';
             echo '<div class="right side"></div>';
 
@@ -281,148 +285,133 @@ if (!$PAGE->user_is_editing())
             continue;
         }
 
-        $showsection = (has_capability('moodle/course:viewhiddensections', $context) or $thissection->visible or !$course->hiddensections);
+        $showsection = (has_capability('moodle/course:viewhiddensections', $context) ||
+            $thissection->visible || !$course->hiddensections);
 
-        if (!empty($displaysection) and $displaysection != $section)
-        {  // Check this topic is visible
-            if ($showsection)
-            {
+        if (!empty($displaysection) && $displaysection != $section) {
+            // Check this topic is visible.
+            if ($showsection) {
                 $sectionmenu[$section] = get_section_name($course, $thissection);
             }
             $section++;
             continue;
         }
 
-        if ($showsection)
-        {
-            //what is course marker?
+        if ($showsection) {
+            // What is course marker?
             $currenttopic = ($course->marker == $section);
             $currenttext = '';
-            if (!$thissection->visible)
-            {
+            if (!$thissection->visible) {
                 $sectionstyle = ' hidden';
-            }
-            else if ($currenttopic)
-            {
+            } else if ($currenttopic) {
                 $sectionstyle = ' current';
                 $currenttext = get_accesshide(get_string('currenttopic', 'format_tabtopics'));
-            }
-            else
-            {
+            } else {
                 $sectionstyle = '';
             }
-            //the default action is to set the name of each topic to null.
+            // The default action is to set the name of each topic to null.
             $secname = $thissection->name;
-            //this will set the name of undefined sections to a number.
-            if ($secname == null)
-            {
+            // This will set the name of undefined sections to a number.
+            if ($secname == null) {
                 $secname = $secname . $num;
                 $num++;
             }
 
-            if (has_capability('moodle/course:viewhiddensections', $context) || $thissection->visible)
-            {
+            if (has_capability('moodle/course:viewhiddensections', $context) || $thissection->visible) {
                 echo '<div id="section-' . $section . '">';
                 // Note, 'right side' is BEFORE content.
                 echo '<div class="right side">';
-                //Replace get_context_instance by the class for moodle 2.6+
-                if(class_exists('context_module'))
-                {
-                    $context_check = context_course::instance($course->id);
+                // Replace get_context_instance by the class for moodle 2.6+.
+                if (class_exists('context_module')) {
+                    $contextcheck = context_course::instance($course->id);
+                } else {
+                    $contextcheck = get_context_instance(CONTEXT_COURSE, $course->id);
                 }
-                else
-                {
-                    $context_check = get_context_instance(CONTEXT_COURSE, $course->id);
-                }
-                if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $context_check))
-                {
-                    if ($course->marker == $section)
-                    {  // Show the "light globe" on/off
-                        echo '<a href="view.php?id=' . $course->id . '&amp;marker=0&amp;sesskey=' . sesskey() . '#section-' . $section . '" title="' . $strmarkedthistopic . '">' . $OUTPUT->pix_icon('i/marked', $strmarkedthistopic) . '"</a><br />';
-                    }
-                    else
-                    {
-                        echo '<a href="view.php?id=' . $course->id . '&amp;marker=' . $section . '&amp;sesskey=' . sesskey() . '#section-' . $section . '" title="' . $strmarkthistopic . '">' . $OUTPUT->pix_icon('i/marker', $strmarkthistopic) . '"</a><br />';
+                if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $contextcheck)) {
+                    if ($course->marker == $section) {
+                        // Show the "light globe" on/off.
+                        echo '<a href="view.php?id=' . $course->id . '&amp;marker=0&amp;sesskey=' . sesskey() . '#section-' .
+                            $section . '" title="' . $strmarkedthistopic . '">' .
+                            $OUTPUT->pix_icon('i/marked', $strmarkedthistopic) . '"</a><br />';
+                    } else {
+                        echo '<a href="view.php?id=' . $course->id . '&amp;marker=' . $section . '&amp;sesskey=' . sesskey() .
+                            '#section-' . $section . '" title="' . $strmarkthistopic . '">' .
+                            $OUTPUT->pix_icon('i/marker', $strmarkthistopic) . '"</a><br />';
                     }
 
-                    if ($thissection->visible)
-                    {   // Show the hide/show eye
-                        echo '<a href="view.php?id=' . $course->id . '&amp;hide=' . $section . '&amp;sesskey=' . sesskey() . '#section-' . $section . '" title="' . $strtopichide . '">' .
-                        $OUTPUT->pix_icon('i/hide', $strtopichide, 'moodle', ['class' => 'icon hide']) . '"</a><br />';
+                    if ($thissection->visible) {
+                        // Show the hide/show eye.
+                        echo '<a href="view.php?id=' . $course->id . '&amp;hide=' . $section . '&amp;sesskey=' . sesskey() .
+                            '#section-' . $section . '" title="' . $strtopichide . '">' .
+                            $OUTPUT->pix_icon('i/hide', $strtopichide, 'moodle', ['class' => 'icon hide']) . '"</a><br />';
+                    } else {
+                        echo '<a href="view.php?id=' . $course->id . '&amp;show=' . $section . '&amp;sesskey=' . sesskey() .
+                            '#section-' . $section . '" title="' . $strtopicshow . '">' .
+                            $OUTPUT->pix_icon('i/show', $strtopicshow, 'moodle', ['class' => 'icon show']) . '"</a><br />';
                     }
-                    else
-                    {
-                        echo '<a href="view.php?id=' . $course->id . '&amp;show=' . $section . '&amp;sesskey=' . sesskey() . '#section-' . $section . '" title="' . $strtopicshow . '">' .
-                        $OUTPUT->pix_icon('i/show', $strtopicshow, 'moodle', ['class' => 'icon show']) . '"</a><br />';
-                    }
-                    if ($section > 1)
-                    {   // Add a arrow to move section up
-                        echo '<a href="view.php?id=' . $course->id . '&amp;random=' . rand(1, 10000) . '&amp;section=' . $section . '&amp;move=-1&amp;sesskey=' . sesskey() . '#section-' . ($section - 1) . '" title="' . $strmoveup . '">' .
-                        $OUTPUT->pix_icon('t/up', $strmoveup, 'moodle', ['class' => 'icon up']) . '"</a><br />';
+                    if ($section > 1) {
+                        // Add a arrow to move section up.
+                        echo '<a href="view.php?id=' . $course->id . '&amp;random=' . rand(1, 10000) .
+                            '&amp;section=' . $section . '&amp;move=-1&amp;sesskey=' . sesskey() . '#section-' .
+                            ($section - 1) . '" title="' . $strmoveup . '">' .
+                            $OUTPUT->pix_icon('t/up', $strmoveup, 'moodle', ['class' => 'icon up']) . '"</a><br />';
                     }
 
-                    if ($section < $course->numsections)
-                    {   // Add a arrow to move section down
-                        echo '<a href="view.php?id=' . $course->id . '&amp;random=' . rand(1, 10000) . '&amp;section=' . $section . '&amp;move=1&amp;sesskey=' . sesskey() . '#section-' . ($section + 1) . '" title="' . $strmovedown . '">' .
-                        $OUTPUT->pix_icon('t/down', $strmovedown, 'moodle', ['class' => 'icon down']) . '"</a><br />';
+                    if ($section < $course->numsections) {
+                        // Add a arrow to move section down.
+                        echo '<a href="view.php?id=' . $course->id . '&amp;random=' . rand(1, 10000) .
+                            '&amp;section=' . $section . '&amp;move=1&amp;sesskey=' . sesskey() . '#section-' .
+                            ($section + 1) . '" title="' . $strmovedown . '">' .
+                            $OUTPUT->pix_icon('t/down', $strmovedown, 'moodle', ['class' => 'icon down']) . '"</a><br />';
                     }
                 }
                 echo '</div>';
 
                 echo '<div class="content">';
-                if (!has_capability('moodle/course:viewhiddensections', $context) and !$thissection->visible)
-                {   // Hidden for students
+                if (!has_capability('moodle/course:viewhiddensections', $context) && !$thissection->visible) {
+                    // Hidden for students.
                     echo get_string('notavailable');
-                }
-                else
-                {
+                } else {
                     $display = '';
 
-                    //display section if avaliable
-                    if (!is_null($thissection->name))
+                    // Display section if avaliable.
+                    if (!is_null($thissection->name)) {
                         $display = $thissection->name;
+                    }
 
-                    //If not visible - show icon for people who can see it
-                    if (!$thissection->visible)
+                    // If not visible - show icon for people who can see it.
+                    if (!$thissection->visible) {
                         $display .= $OUTPUT->pix_icon('i/show', $strtopicshow, 'moodle', ['style' => 'float:right']);
+                    }
 
-                    //output header for section
+                    // Output header for section.
                     echo $OUTPUT->heading($display, 3, 'sectionname');
 
                     echo '<div class="summary">';
-                    if ($thissection->summary)
-                    {
-                        //Replace get_context_instance by the class for moodle 2.6+
-                        if(class_exists('context_module'))
-                        {
+                    if ($thissection->summary) {
+                        // Replace get_context_instance by the class for moodle 2.6+.
+                        if (class_exists('context_module')) {
                             $coursecontext = context_course::instance($course->id);
-                        }
-                        else
-                        {
+                        } else {
                             $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
                         }
-                        $summarytext = file_rewrite_pluginfile_urls($thissection->summary, 'pluginfile.php', $coursecontext->id, 'course', 'section', $thissection->id);
+                        $summarytext = file_rewrite_pluginfile_urls($thissection->summary, 'pluginfile.php',
+                            $coursecontext->id, 'course', 'section', $thissection->id);
                         $summaryformatoptions = new stdClass();
                         $summaryformatoptions->noclean = true;
                         $summaryformatoptions->overflowdiv = true;
                         echo format_text($summarytext, $thissection->summaryformat, $summaryformatoptions);
-                    }
-                    else
-                    {
+                    } else {
                         echo '&nbsp;';
                     }
 
-                    //Replace get_context_instance by the class for moodle 2.6+
-                    if(class_exists('context_module'))
-                    {
-                        $context_check = context_course::instance($course->id);
+                    // Replace get_context_instance by the class for moodle 2.6+.
+                    if (class_exists('context_module')) {
+                        $contextcheck = context_course::instance($course->id);
+                    } else {
+                        $contextcheck = get_context_instance(CONTEXT_COURSE, $course->id);
                     }
-                    else
-                    {
-                        $context_check = get_context_instance(CONTEXT_COURSE, $course->id);
-                    }
-                    if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $context_check))
-                    {
+                    if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $contextcheck)) {
                         echo ' <a title="' . $streditsummary . '" href="editsection.php?id=' . $thissection->id . '">' .
                         $OUTPUT->pix_url('t/edit', $streditsummary) . '" class="icon edit" /></a><br /><br />';
                     }
@@ -432,8 +421,7 @@ if (!$PAGE->user_is_editing())
                     echo $corerenderer->course_section_cm_list($course, $section);
 
                     echo '<br />';
-                    if ($PAGE->user_is_editing())
-                    {
+                    if ($PAGE->user_is_editing()) {
                         echo $corerenderer->course_section_cm_list($course, $section);
                     }
                 }
@@ -459,23 +447,17 @@ if (!$PAGE->user_is_editing())
     echo '</div>';
     echo '</div>';
 
-    //Replace get_context_instance by the class for moodle 2.6+
-    if(class_exists('context_module'))
-    {
-        $context_check = context_course::instance($course->id);
+    // Replace get_context_instance by the class for moodle 2.6+.
+    if (class_exists('context_module')) {
+        $contextcheck = context_course::instance($course->id);
+    } else {
+        $contextcheck = get_context_instance(CONTEXT_COURSE, $course->id);
     }
-    else
-    {
-        $context_check = get_context_instance(CONTEXT_COURSE, $course->id);
-    }
-    if (!$displaysection and $PAGE->user_is_editing() and has_capability('moodle/course:update', $context_check))
-    {
-        // print stealth sections if present
+    if (!$displaysection && $PAGE->user_is_editing() && has_capability('moodle/course:update', $contextcheck)) {
+        // Print stealth sections if present.
         $modinfo = get_fast_modinfo($course);
-        foreach ($sections as $section => $thissection)
-        {
-            if (empty($modinfo->sections[$section]))
-            {
+        foreach ($sections as $section => $thissection) {
+            if (empty($modinfo->sections[$section])) {
                 $section++;
                 continue;
             }
@@ -499,32 +481,26 @@ if (!$PAGE->user_is_editing())
 
     echo "</ul>\n";
 
-    $PAGE->requires->js_init_call('M.tabtopics.init', array($course->id, $isZeroTab), false, $jsmodule);
+    $PAGE->requires->js_init_call('M.tabtopics.init', [$course->id, $iszerotab], false, $jsmodule);
 
-    if (!empty($sectionmenu))
-    {
-        $select = new single_select(new moodle_url('/course/view.php', array('id' => $course->id)), 'topic', $sectionmenu);
+    if (!empty($sectionmenu)) {
+        $select = new single_select(new moodle_url('/course/view.php', ['id' => $course->id]), 'topic', $sectionmenu);
         $select->label = get_string('jumpto');
         $select->class = 'jumpmenu';
         $select->formid = 'sectionmenu';
         echo $OUTPUT->render($select);
     }
-}
-//this is the editing window
-else
-{
-    // If Moodle 2.3 or more Generate the sections like the topics
+} else {
+    // This is the editing window.
+    // If Moodle 2.3 or more Generate the sections like the topics.
     $renderer = $PAGE->get_renderer('format_topics');
 
-    if (!empty($displaysection))
-    {
+    if (!empty($displaysection)) {
         $renderer->print_single_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection);
-    }
-    else
-    {
+    } else {
         $renderer->print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused);
     }
 
-    // Include course format js module
+    // Include course format js module.
     $PAGE->requires->js('/course/format/topics/format.js');
 }

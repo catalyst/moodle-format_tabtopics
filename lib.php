@@ -135,6 +135,15 @@ class format_tabtopics extends core_courseformat\base {
     }
 
     /**
+     * Returns true if this course format supports components.
+     *
+     * @return bool
+     */
+    public function supports_components() {
+        return true;
+    }
+
+    /**
      * Loads all of the course sections into the navigation
      *
      * @param global_navigation $navigation

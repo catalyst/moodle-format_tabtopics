@@ -91,15 +91,12 @@ if (!$PAGE->user_is_editing()) {
     $strgroups = get_string('groups');
     $strgroupmy = get_string('groupmy');
     $editing = $PAGE->user_is_editing();
-
-    if ($editing) {
-        $strtopichide = get_string('hidetopicfromothers');
-        $strtopicshow = get_string('showtopicfromothers');
-        $strmarkthistopic = get_string('markthistopic');
-        $strmarkedthistopic = get_string('markedthistopic');
-        $strmoveup = get_string('moveup');
-        $strmovedown = get_string('movedown');
-    }
+    $strtopichide = get_string('hidetopicfromothers');
+    $strtopicshow = get_string('showtopicfromothers');
+    $strmarkthistopic = get_string('markthistopic');
+    $strmarkedthistopic = get_string('markedthistopic');
+    $strmoveup = get_string('moveup');
+    $strmovedown = get_string('movedown');
 
     // If currently moving a file then show the current clipboard.
     // Not too sure what this does.

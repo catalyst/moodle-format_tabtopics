@@ -91,10 +91,10 @@ if (!$PAGE->user_is_editing()) {
     $strgroups = get_string('groups');
     $strgroupmy = get_string('groupmy');
     $editing = $PAGE->user_is_editing();
-    $strtopichide = get_string('hidetopicfromothers');
-    $strtopicshow = get_string('showtopicfromothers');
-    $strmarkthistopic = get_string('markthistopic');
-    $strmarkedthistopic = get_string('markedthistopic');
+    $strtopichide = get_string('hidetopicfromothers', 'format_tabtopics');
+    $strtopicshow = get_string('showtopicfromothers', 'format_tabtopics');
+    $strmarkthistopic = get_string('markthistopic', 'format_tabtopics');
+    $strmarkedthistopic = get_string('markedthistopic', 'format_tabtopics');
     $strmoveup = get_string('moveup');
     $strmovedown = get_string('movedown');
 

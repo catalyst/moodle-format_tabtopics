@@ -40,6 +40,8 @@ $string['sectionname'] = 'Topic';
 $string['showalltopics'] = 'Show all topics';
 $string['showfromothers'] = 'Show topic';
 $string['showtopicfromothers'] = 'Show topic';
+$string['markedthistopic'] = 'This section is highlighted as the current section';
+$string['markthistopic'] = 'Highlight this section as the current section';
 
 $string['tabtopics_remember_last_tab_session'] = 'Return user to previous selected tab';
 $string['tabtopics_remember_last_tab_session_help'] = 'If yes user will return to previous selected tab instead of the first tab.';

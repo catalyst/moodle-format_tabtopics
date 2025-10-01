@@ -48,4 +48,13 @@ class renderer extends section_renderer {
     protected function page_title() {
         return get_string('topicoutline');
     }
+
+    /**
+     * Display a hidden section message
+     *
+     * @param type $section
+     */
+    public function section_hidden($section, $courseorid = null) {
+        echo parent::section_hidden($section, $courseorid);
+    }
 }
